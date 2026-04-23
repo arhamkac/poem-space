@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { X, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Edit3 } from 'lucide-react'
@@ -29,6 +30,8 @@ export default function PoemForm({ isOpen, onClose, onPostCreated }: { isOpen: b
 
   // Removed auto-sizing to allow flexbox and min-height to govern the writing area
 
+  const router = useRouter()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage(null)
@@ -55,8 +58,11 @@ export default function PoemForm({ isOpen, onClose, onPostCreated }: { isOpen: b
       setIsSuccess(true)
       onPostCreated()
       
+      // Redirect to archive after showing the success message
       setTimeout(() => {
-        setStep(1); setPoem(''); setTitle(''); setContext(''); setName(''); setInsta(''); setIsSuccess(false); onClose()
+        setStep(1); setPoem(''); setTitle(''); setContext(''); setName(''); setInsta(''); setIsSuccess(false); 
+        onClose()
+        router.push('/archive?published=true')
       }, 2500)
     } catch (err: any) {
       setErrorMessage(err.message)

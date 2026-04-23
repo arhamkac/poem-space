@@ -3,12 +3,60 @@
 import Header from '@/components/Header'
 import PoemGallery from '@/components/PoemGallery'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { CheckCircle2 } from 'lucide-react'
 
-export default function ArchivePage() {
+function ArchiveContent() {
+  const searchParams = useSearchParams()
+  const [showNotification, setShowNotification] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('published') === 'true') {
+      setShowNotification(true)
+      const timer = setTimeout(() => setShowNotification(false), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [searchParams])
+
   return (
     <main style={{ minHeight: '100vh', position: 'relative', background: 'transparent' }}>
       <div className="vignette"></div>
+
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 20, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            style={{
+              position: 'fixed',
+              top: '2rem',
+              left: '50%',
+              x: '-50%',
+              zIndex: 10000,
+              background: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid var(--gold)',
+              padding: '1rem 2rem',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+              color: 'var(--gold)',
+              fontFamily: 'var(--font-cinzel)',
+              fontWeight: 900,
+              letterSpacing: '0.1em',
+              fontSize: '0.8rem'
+            }}
+          >
+            <CheckCircle2 size={20} />
+            YOUR POEM HAS BEEN PUBLISHED
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Header />
 
@@ -36,7 +84,14 @@ export default function ArchivePage() {
           </Link>
         </div>
       </div>
-
     </main>
+  )
+}
+
+export default function ArchivePage() {
+  return (
+    <Suspense fallback={null}>
+      <ArchiveContent />
+    </Suspense>
   )
 }
