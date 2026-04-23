@@ -29,8 +29,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${dancing.variable}`}>
-      <body>
-        <div className="vibrant-desk" id="desk-parallax"></div>
+      <body className={`${inter.className} antialiased`}>
+        <div className="noise-overlay"></div>
         {children}
       </body>
     </html>

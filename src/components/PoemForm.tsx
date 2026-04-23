@@ -27,12 +27,7 @@ export default function PoemForm({ isOpen, onClose, onPostCreated }: { isOpen: b
     return () => window.removeEventListener('keydown', handleKeys)
   }, [isOpen, onClose])
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-    }
-  }, [poem, step])
+  // Removed auto-sizing to allow flexbox and min-height to govern the writing area
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,44 +65,9 @@ export default function PoemForm({ isOpen, onClose, onPostCreated }: { isOpen: b
     }
   }
 
-  const progressWidth = step === 1 ? '50%' : '100%'
+  const progressWidth = (step / 3) * 100 + '%'
 
-  // REUSABLE MASTERPIECE INPUT STYLES
-  const inputBaseStyle: React.CSSProperties = {
-    all: 'unset',
-    width: '100%',
-    fontFamily: 'var(--font-serif)',
-    fontSize: '1.8rem',
-    fontWeight: 900,
-    color: 'var(--ink)',
-    borderBottom: '2px solid #ddd',
-    padding: '0.8rem 0',
-    marginBottom: '1.5rem',
-    display: 'block'
-  }
-
-  const handTextAreaStyle: React.CSSProperties = {
-    all: 'unset',
-    width: '100%',
-    fontFamily: 'var(--font-hand)',
-    fontSize: '1.6rem',
-    color: '#333',
-    minHeight: '120px',
-    display: 'block'
-  }
-
-  const manuscriptStyle: React.CSSProperties = {
-    all: 'unset',
-    flex: 1,
-    width: '100%',
-    fontFamily: 'var(--font-body)',
-    fontSize: '1.4rem',
-    lineHeight: '2.4rem',
-    color: 'var(--ink)',
-    overflowY: 'auto',
-    backgroundImage: 'repeating-linear-gradient(transparent, transparent 2.35rem, rgba(0,0,0,0.02) 2.4rem)',
-    paddingRight: '1.5rem'
-  }
+  // Styles moved to CSS classes or handled via clamp()
 
   return (
     <AnimatePresence>
@@ -129,65 +89,112 @@ export default function PoemForm({ isOpen, onClose, onPostCreated }: { isOpen: b
                     <p style={{ opacity: 0.5, letterSpacing: '0.2em', marginTop: '1rem', fontSize: '0.7rem' }}>YOUR WHISPER HAS BEEN SEALED IN THE ARCHIVE.</p>
                   </motion.div>
                 ) : step === 1 ? (
-                  <motion.div key="step1" style={{ display: 'flex', flex: 1, height: '100%' }} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }}>
+                  <motion.div key="step1" className="step-container" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }}>
                     <div className="sanctuary-page">
                       <span className="label-caps">Phase I</span>
                       <h1 className="h1-serif">The Spark</h1>
-                      <div style={{ marginTop: '1rem' }}>
+                      <div style={{ marginTop: '2rem' }}>
                         <span className="label-caps">Whisper a Title</span>
-                        <input type="text" style={inputBaseStyle} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Unnamed Soul..." />
+                        <input type="text" className="input-underline" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Unnamed Soul..." />
                       </div>
-                      <div style={{ marginTop: '1rem' }}>
-                        <span className="label-caps">The Backstory(Optional)</span>
+                      <div style={{ marginTop: '2rem' }}>
+                        <span className="label-caps">The Backstory (Optional)</span>
                         <div className="backstory-frame">
-                          <textarea style={handTextAreaStyle} value={context} onChange={(e) => setContext(e.target.value)} placeholder="What led you here?" />
+                          <textarea className="hand-textarea" style={{ all: 'unset', width: '100%', fontFamily: 'var(--font-hand)', fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', color: '#333', minHeight: '150px', display: 'block' }} value={context} onChange={(e) => setContext(e.target.value)} placeholder="What led you here?" />
                         </div>
                       </div>
+                      <div className="page-footer-sticky">
+                        <div />
+                        <button className="primary-btn" onClick={() => setStep(2)}>
+                          NEXT <ArrowRight size={16} style={{ marginLeft: '1rem' }} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="sanctuary-page" style={{ borderLeft: '1px solid rgba(0,0,0,0.05)' }}>
-                      <span className="label-caps">Phase II</span>
-                      <h1 className="h1-serif">The Manuscript</h1>
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        <textarea ref={textareaRef} style={manuscriptStyle as any} value={poem} onChange={(e) => setPoem(e.target.value)} placeholder="Begin your journey..." required />
+                  </motion.div>
+                ) : step === 2 ? (
+                  <motion.div key="step2" className="step-container" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }}>
+                    <div className="sanctuary-page">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <span className="label-caps">Phase II</span>
+                          <h1 className="h1-serif">The Manuscript</h1>
+                        </div>
+                        <button onClick={() => setStep(1)} className="secondary-btn">
+                          <ArrowLeft size={14} style={{ marginRight: '0.5rem' }} /> BACK
+                        </button>
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '1rem' }}>
+                        <textarea 
+                          ref={textareaRef} 
+                          className="manuscript-editor" 
+                          style={{ minHeight: '50vh' }}
+                          value={poem} 
+                          onChange={(e) => setPoem(e.target.value)} 
+                          placeholder="Type your poem here... Let it flow like ink on old parchment." 
+                          required 
+                        />
                       </div>
                       <div className="page-footer-sticky">
                         <div style={{ fontSize: '0.6rem', color: '#999', fontWeight: 800 }}>{poem.length} CHARACTERS</div>
-                        <button className="primary-btn" onClick={() => setStep(2)} disabled={!poem.trim()}>REVIEW <ArrowRight size={16} style={{ marginLeft: '1rem' }} /></button>
+                        <button className="primary-btn" onClick={() => setStep(3)} disabled={!poem.trim()}>
+                          REVIEW <ArrowRight size={16} style={{ marginLeft: '1rem' }} />
+                        </button>
                       </div>
                     </div>
                   </motion.div>
                 ) : (
-                  <motion.div key="step2" style={{ display: 'flex', flex: 1, height: '100%' }} initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }}>
-                    <div className="sanctuary-page">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <motion.div key="step3" className="step-container" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }}>
+                    <div className="sanctuary-page" style={{ overflowY: 'auto' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
                           <span className="label-caps">Phase III</span>
-                          <h1 className="h1-serif">The Preview</h1>
+                          <h1 className="h1-serif">The Seal</h1>
                         </div>
-                        <button onClick={() => setStep(1)} className="secondary-btn">
-                          <Edit3 size={16} style={{ marginRight: '0.8rem' }} /> EDIT
+                        <button onClick={() => setStep(2)} className="secondary-btn">
+                          <ArrowLeft size={14} style={{ marginRight: '0.5rem' }} /> RE-EDIT
                         </button>
                       </div>
                       
-                      <div className="preview-body-container">
-                        <h1 className="preview-title">{title || 'Untitled'}</h1>
-                        {context && <div className="preview-context">"{context}"</div>}
-                        <p className="preview-body">{poem}</p>
-                        <div className="preview-signature" style={{ marginTop: 'auto', paddingBottom: '2rem' }}>
-                          <div className="signature-ink">— {name || 'Anonymous'}</div>
-                          {insta && <div className="insta-seal">@{insta.replace('@', '')}</div>}
+                      <div className="preview-small-frame" style={{ marginTop: '2rem', padding: '2.5rem', background: 'rgba(0,0,0,0.03)', borderLeft: '4px solid var(--gold)', maxHeight: '400px', overflowY: 'auto' }}>
+                        <span className="label-caps" style={{ opacity: 0.4 }}>Final Proof</span>
+                        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', fontWeight: 900, marginTop: '1rem' }}>{title || 'Untitled Masterpiece'}</h2>
+                        
+                        {context && (
+                          <div style={{ marginTop: '1.5rem', marginBottom: '2rem', padding: '1rem', background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '4px' }}>
+                            <span className="label-caps" style={{ fontSize: '0.6rem', opacity: 0.5 }}>The Backstory</span>
+                            <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', fontStyle: 'italic', marginTop: '0.5rem', opacity: 0.7 }}>{context}</p>
+                          </div>
+                        )}
+
+                        <div style={{ marginTop: '1.5rem' }}>
+                          <span className="label-caps" style={{ fontSize: '0.6rem', opacity: 0.5 }}>The Manuscript</span>
+                          <p style={{ marginTop: '0.5rem', whiteSpace: 'pre-wrap', opacity: 0.9, fontSize: '1rem', lineHeight: '1.8rem', fontFamily: 'var(--font-body)' }}>{poem}</p>
+                        </div>
+
+                        <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px dashed rgba(0,0,0,0.1)' }}>
+                          <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', color: 'var(--ink)' }}>
+                            {name || '— Anonymous'}
+                          </p>
+                          {insta && (
+                            <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.2rem', fontFamily: 'var(--font-sans)', fontWeight: 800 }}>
+                              {insta.startsWith('@') ? insta : `@${insta}`}
+                            </p>
+                          )}
                         </div>
                       </div>
-                    </div>
-                    <div className="sanctuary-page" style={{ borderLeft: '1px solid rgba(0,0,0,0.05)' }}>
-                      <span className="label-caps">Final Phase</span>
-                      <h1 className="h1-serif">The Seal</h1>
-                      <form onSubmit={handleSubmit} style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', flex: 1 }}>
-                        <div><span className="label-caps">Your Identity</span><input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name / Pen Name" required style={inputBaseStyle} /></div>
-                        <div><span className="label-caps">Instagram (Optional)</span><input type="text" value={insta} onChange={(e) => setInsta(e.target.value)} placeholder="@username" style={inputBaseStyle} /></div>
+
+                      <form onSubmit={handleSubmit} style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div>
+                          <span className="label-caps">Your Identity</span>
+                          <input type="text" className="input-underline" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name / Pen Name" required />
+                        </div>
+                        <div>
+                          <span className="label-caps">Instagram (Optional)</span>
+                          <input type="text" className="input-underline" value={insta} onChange={(e) => setInsta(e.target.value)} placeholder="@username" />
+                        </div>
                         
-                        <div className="page-footer-sticky">
-                          {errorMessage && <div style={{ color: '#ff4b4b', fontSize: '0.7rem', fontWeight: 800 }}><AlertCircle size={14} style={{ marginRight: '0.5rem' }} /> {errorMessage}</div>}
+                        <div className="page-footer-sticky" style={{ paddingBottom: '2rem', marginTop: '2rem' }}>
+                          {errorMessage && <div style={{ color: '#ff4b4b', fontSize: '0.7rem', fontWeight: 800, marginBottom: '1rem' }}><AlertCircle size={14} style={{ marginRight: '0.5rem' }} /> {errorMessage}</div>}
                           <button type="submit" disabled={loading} className="primary-btn" style={{ width: '100%', padding: '1.8rem' }}>
                             {loading ? 'COMMITTING...' : 'COMMIT TO ARCHIVE'}
                           </button>

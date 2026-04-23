@@ -27,30 +27,54 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--dark-gold); border-radius: 10px; }
 
-html, body {
-  background-color: var(--background);
+body {
+  background-color: #0a0a0b;
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-}
-
-.vibrant-desk {
-  position: fixed;
-  inset: 0;
-  background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.5)), url('/assets/artistic_bg.png');
+  background-image: 
+    linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.1)), 
+    url('/assets/artistic_bg.png');
   background-size: cover;
   background-position: center;
-  z-index: -100;
-  filter: contrast(1.1) brightness(0.4);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes gold-pulse {
+  0% { box-shadow: 0 0 20px rgba(229, 192, 91, 0.1); }
+  50% { box-shadow: 0 0 50px rgba(229, 192, 91, 0.3); }
+  100% { box-shadow: 0 0 20px rgba(229, 192, 91, 0.1); }
+}
+
+.write-trigger-btn {
+  animation: gold-pulse 4s infinite ease-in-out;
 }
 
 /* FORCING PROFESSIONAL STYLES (ABSOLUTE SPECIFICITY) */
 .sanctuary-overlay .write-trigger {
   all: unset !important;
-  background: rgba(0, 0, 0, 0.6) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
   color: var(--gold) !important;
-  border: 2px solid var(--gold) !important;
+  border: 1px solid rgba(229, 192, 91, 0.4) !important;
   padding: 2.5rem 8rem !important;
   font-family: var(--font-cinzel) !important;
   font-weight: 900 !important;
@@ -58,8 +82,17 @@ html, body {
   text-transform: uppercase !important;
   letter-spacing: 0.6em !important;
   cursor: pointer !important;
-  backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(10px) !important;
   display: block !important;
+  transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+  box-shadow: 0 0 50px rgba(0,0,0,0.5) !important;
+}
+
+.sanctuary-overlay .write-trigger:hover {
+  background: rgba(229, 192, 91, 0.1) !important;
+  border-color: var(--gold) !important;
+  letter-spacing: 0.8em !important;
+  box-shadow: 0 0 80px rgba(229, 192, 91, 0.15) !important;
 }
 
 .sanctuary-overlay .primary-btn {
@@ -107,42 +140,55 @@ html, body {
 .sanctuary-book {
   background: var(--paper) !important;
   background-image: linear-gradient(rgba(254, 252, 247, 0.99), rgba(254, 252, 247, 0.99)), url('https://www.transparenttextures.com/patterns/old-map.png');
-  width: 95vw;
-  max-width: 1400px;
-  height: 92vh;
+  width: 90vw;
+  max-width: 900px; /* Reduced from 1400px for better focus */
+  height: auto;
+  max-height: 85vh; /* Reduced height to feel less empty */
   display: flex;
   flex-direction: column;
   position: relative;
   box-shadow: 0 50px 100px rgba(0,0,0,0.8);
   border: 1px solid rgba(229,192,91,0.2);
   overflow: hidden;
+  border-radius: 4px;
 }
 
 .sanctuary-page {
   flex: 1;
-  padding: 3rem 4rem;
+  padding: clamp(2rem, 5vh, 4rem) clamp(1.5rem, 5vw, 6rem);
   display: flex;
   flex-direction: column;
   color: var(--ink) !important;
-  height: 100% !important; /* Force full height */
-  overflow: hidden;
+  min-height: 70vh; /* Ensure the page has enough height */
+  overflow-y: auto;
+  width: 100%;
 }
 
-.book-body { flex: 1; display: flex; overflow: hidden; position: relative; }
+.book-body { flex: 1; display: flex; overflow-y: auto !important; position: relative; width: 100%; }
+
+.step-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
 
 /* MANUSCRIPT PART EXTENDING TILL BOTTOM */
 .manuscript-editor {
-  all: unset !important;
-  flex: 1 !important; /* Use all space */
-  width: 100% !important;
-  font-family: var(--font-body) !important;
-  font-size: 1.4rem !important;
-  line-height: 2.6rem !important;
-  color: var(--ink) !important;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  flex: 1;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  line-height: 2.6rem;
+  color: var(--ink);
   overflow-y: auto !important;
-  background-image: repeating-linear-gradient(transparent, transparent 2.55rem, rgba(0,0,0,0.02) 2.6rem) !important;
-  padding-right: 1.5rem !important;
-  margin-bottom: 1rem !important;
+  background-image: repeating-linear-gradient(transparent, transparent 2.55rem, rgba(0,0,0,0.02) 2.6rem);
+  padding-right: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 /* PREVIEW SCROLLABLE FIX */
@@ -193,6 +239,174 @@ html, body {
 }
 
 @media (max-width: 1024px) {
-  .sanctuary-book { width: 100vw; height: 100vh; }
-  .sanctuary-page { padding: 2.5rem; }
+  .sanctuary-book { 
+    width: 100vw !important; 
+    height: 100vh !important; 
+    max-height: 100vh !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+  .sanctuary-page { 
+    padding: 2rem 1.5rem !important; 
+    height: auto !important;
+    min-height: 50vh;
+  }
+  .book-body {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+  .sanctuary-page:not(:last-child) {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+}
+
+/* ARCHIVE RESPONSIVE STYLES */
+.archive-title {
+  font-family: var(--font-cinzel);
+  font-size: 4rem;
+  letter-spacing: 0.5em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.archive-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.poem-card {
+  background: var(--paper);
+  background-image: linear-gradient(rgba(254, 252, 247, 0.98), rgba(254, 252, 247, 0.98)), url("https://www.transparenttextures.com/patterns/old-map.png");
+  padding: 4rem;
+  border-left: 12px solid #e2decf;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.poem-card-title {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #111;
+  margin-top: 0.8rem;
+  font-style: italic;
+}
+
+.poem-card-author {
+  font-family: var(--font-hand);
+  font-size: 2.5rem;
+  color: #111;
+}
+
+.poem-card-content {
+  font-family: var(--font-body);
+  fontSize: 1.3rem;
+  line-height: 2.4rem;
+  color: #111;
+  white-space: pre-wrap;
+}
+
+.master-btn {
+  all: unset;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--gold);
+  border: 1px solid rgba(229, 192, 91, 0.4);
+  font-family: var(--font-cinzel);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  padding: 1.5rem 4rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  text-decoration: none !important;
+  display: inline-block;
+  text-align: center;
+}
+
+.master-btn:hover {
+  background: rgba(229, 192, 91, 0.1);
+  border-color: var(--gold);
+  box-shadow: 0 0 50px rgba(229, 192, 91, 0.2);
+}
+
+@media (max-width: 768px) {
+  .archive-title {
+    font-size: 2rem !important;
+    letter-spacing: 0.2em !important;
+  }
+  
+  .archive-container {
+    padding: 0 1rem !important;
+  }
+
+  .poem-card {
+    padding: 2rem !important;
+    border-left-width: 6px !important;
+    gap: 1.5rem !important;
+  }
+
+  .poem-card-title {
+    font-size: 1.8rem !important;
+  }
+
+  .poem-card-content {
+    font-size: 1.1rem !important;
+    line-height: 1.8rem !important;
+  }
+
+  .poem-card-author {
+    font-size: 1.8rem !important;
+  }
+
+  .master-btn {
+    padding: 1.2rem 2.5rem !important;
+    font-size: 0.8rem !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .pagination-container {
+    gap: 1.5rem !important;
+    margin-top: 4rem !important;
+  }
+
+  .preview-title {
+    font-size: 2rem !important;
+  }
+
+  .preview-body {
+    font-size: 1.1rem !important;
+    line-height: 1.8rem !important;
+  }
+
+  .h1-serif {
+    font-size: 2.2rem !important;
+  }
+
+  .sanctuary-overlay .input-underline {
+    font-size: 1.4rem !important;
+  }
+
+  .cross-close-pro {
+    all: unset;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    color: white;
+    z-index: 10000;
+    cursor: pointer;
+    background: rgba(0,0,0,0.5);
+    padding: 0.5rem;
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+  }
 }

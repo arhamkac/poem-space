@@ -8,21 +8,13 @@ import { motion } from 'framer-motion'
 export default function ArchivePage() {
   return (
     <main style={{ minHeight: '100vh', position: 'relative', background: 'transparent' }}>
-      {/* THE MASTER BACKGROUND */}
-      <div className="vibrant-desk"></div>
+      <div className="vignette"></div>
 
       <Header />
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
-        <div style={{ textAlign: 'center', marginBottom: '8rem' }}>
-          <h1 style={{ 
-            fontFamily: 'var(--font-cinzel)', 
-            fontSize: '4rem', 
-            letterSpacing: '0.5em', 
-            color: 'var(--gold)',
-            textTransform: 'uppercase',
-            marginBottom: '1rem'
-          }}>
+      <div className="archive-container">
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(4rem, 10vh, 8rem)' }}>
+          <h1 className="archive-title">
             The Archive
           </h1>
           <p style={{ opacity: 0.5, letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: '0.8rem' }}>
@@ -32,12 +24,12 @@ export default function ArchivePage() {
 
         <PoemGallery refreshKey={0} />
 
-        <div style={{ textAlign: 'center', marginTop: '10rem', paddingBottom: '10rem' }}>
-          <Link href="/">
+        <div style={{ textAlign: 'center', marginTop: 'clamp(5rem, 15vh, 10rem)', paddingBottom: 'clamp(5rem, 15vh, 10rem)' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
             <motion.button 
               className="master-btn"
-              whileHover={{ scale: 1.05, letterSpacing: '0.5em' }}
-              style={{ padding: '2rem 5rem' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               RETURN TO SANCTUARY
             </motion.button>
@@ -45,16 +37,6 @@ export default function ArchivePage() {
         </div>
       </div>
 
-      <footer style={{ 
-        padding: '6rem 0 4rem', 
-        textAlign: 'center', 
-        color: 'rgba(255,255,255,0.4)', 
-        fontSize: '0.8rem',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        background: 'rgba(0,0,0,0.5)'
-      }}>
-        <div suppressHydrationWarning>© {new Date().getFullYear()} Poem Space. The Archive of Untold Whispers.</div>
-      </footer>
     </main>
   )
 }
